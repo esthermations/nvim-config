@@ -4,82 +4,116 @@
 
 -- cd to home on startup...
 vim.api.nvim_command('autocmd VimEnter * cd ~')
+vim.api.nvim_command('colorscheme PaperColor')
 
 local o  = vim.o
 local wo = vim.wo
 
-vim.cmd 'colorscheme rose-pine'
-o.background  = 'light'
-o.guifont = "JetBrains Mono:10"
-
-o.expandtab  = true -- Spaces not tabs
-o.joinspaces = true -- No double-spaces from Shift+J
-o.smartcase  = true
-o.shiftwidth = 3
-
-o.termguicolors = true
-
-o.scrolloff = 2
-o.hlsearch  = true
-o.incsearch = true
-
-o.updatetime  = 250
+o.background = 'light'
 o.completeopt = 'menuone,noselect'
+o.errorbells = false
+o.expandtab  = true -- Spaces not tabs
+o.guifont = 'JetBrains Mono:h12'
+o.hlsearch = true
+o.incsearch = true
+o.joinspaces = true -- No double-spaces from Shift+J
+o.scrolloff = 2
+o.shiftwidth = 3
+o.smartcase  = true
+o.syntax = 'on'
+o.termguicolors = true
+o.updatetime = 250
 
 wo.number = true
 wo.relativenumber = true
-
-vim.api.nvim_set_keymap('', '<Space>', '<Nop>', { noremap = true, silent = true })
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
 
 -- Neovide
 vim.g.neovide_cursor_vfx_mode = "wireframe"
 vim.g.neovide_refresh_rate    = 100
 
---
+------------------------------------------------------------------------------
+-- Keymaps
+------------------------------------------------------------------------------
+
+local MapKey = function(Mode, Key, Result)
+   vim.api.nvim_set_keymap(Mode, Key, Result, {noremap = true, silent = true})  
+end
+
+local KeysToUnmap = { '<space>', '<up>', '<down>', '<left>', '<right>' }
+
+for _, Key in ipairs(KeysToUnmap) do
+   MapKey('', Key, '<nop>')
+end
+
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
+MapKey('n', '<leader>b<tab>', ':bNext')
+MapKey('n', '<leader>b<s-tab>', ':-1bNext')
+MapKey('n', '<leader>wk', '<c-w>k')
+MapKey('n', '<leader>wj', '<c-w>j')
+MapKey('n', '<leader>wh', '<c-w>h')
+MapKey('n', '<leader>wl', '<c-w>l')
+
+------------------------------------------------------------------------------
 -- Packages
---
+------------------------------------------------------------------------------
 
-vim.cmd [[packadd packer.nvim]]
+vim.cmd('packadd packer.nvim')
+local packer = require('packer')
+local util   = require('packer.util')
 
-require('packer').startup(function()
+packer.startup(function()
    use 'wbthomason/packer.nvim'
    use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
    use 'neovim/nvim-lspconfig'
    use 'folke/which-key.nvim'
    use 'feline-nvim/feline.nvim'
+
    use 'NLKNguyen/papercolor-theme'
    use { 'rose-pine/neovim', as = 'rose-pine' }
+
    use { 'nvim-telescope/telescope.nvim', requires = { 'nvim-lua/plenary.nvim' } }
    use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'c:/msys2/usr/bin/make.exe' }
+
    use 'hrsh7th/nvim-cmp'
    use 'hrsh7th/cmp-nvim-lsp'
    use 'numToStr/Comment.nvim' -- 'gc' on visual area to comment it out
+   use 'rcarriga/nvim-notify'
+
+   use 'nvim-orgmode/orgmode'
 end)
 
+require('orgmode').setup({})
+require('feline').setup({})
 
-require('feline').setup({ preset = 'noicon' })
---require('statusline')
-
-require('telescope').setup { extensions = { fzf = {} } }
+require('telescope').setup({ extensions = { fzf = {} } })
 require('telescope').load_extension('fzf')
 
+MapKey('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').buffers()<CR>]])
+MapKey('n', '<leader>sf', [[<cmd>lua require('telescope.builtin').find_files({previewer = false})<CR>]])
+MapKey('n', '<leader>sb', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>]])
+MapKey('n', '<leader>sh', [[<cmd>lua require('telescope.builtin').help_tags()<CR>]])
+MapKey('n', '<leader>st', [[<cmd>lua require('telescope.builtin').tags()<CR>]])
+MapKey('n', '<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<CR>]])
+MapKey('n', '<leader>sp', [[<cmd>lua require('telescope.builtin').live_grep()<CR>]])
+MapKey('n', '<leader>so', [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<CR>]])
+MapKey('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]])
 
-vim.api.nvim_set_keymap('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').buffers()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sf', [[<cmd>lua require('telescope.builtin').find_files({previewer = false})<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sb', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sh', [[<cmd>lua require('telescope.builtin').help_tags()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>st', [[<cmd>lua require('telescope.builtin').tags()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sp', [[<cmd>lua require('telescope.builtin').live_grep()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>so', [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]], { noremap = true, silent = true })
-
+require('orgmode').setup_ts_grammar()
 require('nvim-treesitter.configs').setup {
-   highlight = { enable = true },
    indent    = { enable = true },
+   highlight = { 
+      enable = true, 
+      disable = {'org'},
+      additional_vim_regex_highlighting = {'org'}
+   },
+   ensure_installed = {'org'}
 }
+
+require('orgmode').setup({
+   org_default_notes_file = '%USERPROFILE%/Notes/Everything.org'
+})
 
 local lspconfig = require('lspconfig')
 local on_attach = function(_, bufnr)
@@ -118,5 +152,6 @@ end
 
 --lsp.als.setup({ cmd = "C:/Users/Esther O'Keefe/Bin/als.exe" })
  
+vim.notify = require("notify")
 
 -- vim: ts=3 sts=3 sw=3 et
