@@ -1,6 +1,8 @@
 -- esther's vim config... in lua.
-
 -- To paste stuff in here in neovide, type "+p in normal mode.
+
+-- Grab packages. This is done first for, y'know, dependency reasons.
+require('packages')
 
 -- cd to home on startup...
 vim.api.nvim_command('autocmd VimEnter * cd ~')
@@ -55,41 +57,6 @@ MapKey('n', '<leader>wj', '<c-w>j')
 MapKey('n', '<leader>wh', '<c-w>h')
 MapKey('n', '<leader>wl', '<c-w>l')
 
-------------------------------------------------------------------------------
--- Packages
-------------------------------------------------------------------------------
-
-vim.cmd('packadd packer.nvim')
-local packer = require('packer')
-local util   = require('packer.util')
-
-packer.startup(function()
-   use 'wbthomason/packer.nvim'
-   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-   use 'neovim/nvim-lspconfig'
-   use 'folke/which-key.nvim'
-   use 'feline-nvim/feline.nvim'
-
-   use 'NLKNguyen/papercolor-theme'
-   use { 'rose-pine/neovim', as = 'rose-pine' }
-
-   use { 'nvim-telescope/telescope.nvim', requires = { 'nvim-lua/plenary.nvim' } }
-   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'c:/msys2/usr/bin/make.exe' }
-
-   use 'hrsh7th/nvim-cmp'
-   use 'hrsh7th/cmp-nvim-lsp'
-   use 'numToStr/Comment.nvim' -- 'gc' on visual area to comment it out
-   use 'rcarriga/nvim-notify'
-
-   use 'nvim-orgmode/orgmode'
-end)
-
-require('orgmode').setup({})
-require('feline').setup({})
-
-require('telescope').setup({ extensions = { fzf = {} } })
-require('telescope').load_extension('fzf')
-
 MapKey('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').buffers()<CR>]])
 MapKey('n', '<leader>sf', [[<cmd>lua require('telescope.builtin').find_files({previewer = false})<CR>]])
 MapKey('n', '<leader>sb', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>]])
@@ -99,6 +66,12 @@ MapKey('n', '<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<
 MapKey('n', '<leader>sp', [[<cmd>lua require('telescope.builtin').live_grep()<CR>]])
 MapKey('n', '<leader>so', [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<CR>]])
 MapKey('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]])
+
+require('orgmode').setup({})
+require('feline').setup({})
+
+require('telescope').setup({ extensions = { fzf = {} } })
+require('telescope').load_extension('fzf')
 
 require('orgmode').setup_ts_grammar()
 require('nvim-treesitter.configs').setup {
